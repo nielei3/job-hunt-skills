@@ -1,0 +1,756 @@
+resume:
+  source: vault_relative
+  path: Career/resume/resume.md
+
+target_companies:
+  - name: Netflix
+    ats: phenom
+    phenom_host: explore.jobs.netflix.net
+    phenom_domain: netflix.com
+  - name: Airbnb
+    ats: greenhouse
+    board_slug: airbnb
+  - name: Reddit
+    ats: greenhouse
+    board_slug: reddit
+  - name: Affirm
+    ats: greenhouse
+    board_slug: affirm
+  - name: Anthropic
+    ats: greenhouse
+    board_slug: anthropic
+  # Microsoft + Microsoft AI both come from the same PCSX domain; Microsoft AI
+  # uses team_filter to keep just AI-org roles. The seen_keys dedup will collapse
+  # any overlap (same JD URL → same job_key), so duplicate scanning is harmless.
+  - name: Microsoft
+    ats: pcsx
+    domain: microsoft.com
+  - name: Microsoft AI
+    ats: pcsx
+    domain: microsoft.com
+    team_filter: ai
+  - name: Apple
+    ats: apple_jobs
+  - name: Amazon
+    ats: amazon_jobs
+    amazon_categories:
+      - software-development
+  # Google + Meta adapters are best-effort — careers.google.com and metacareers.com
+  # don't expose stable public APIs. The scanner parses SSR HTML; if their layout
+  # changes the listing may return zero results (logged, run continues).
+  # Verify with: python3 scripts/scan_target_companies.py -c google
+  - name: Google
+    ats: google_careers
+  - name: Meta
+    ats: meta_careers
+  # ── Greenhouse big-tech / unicorns ───────────────────────────────────────
+  - name: Stripe
+    ats: greenhouse
+    board_slug: stripe
+  - name: Snap
+    ats: greenhouse
+    board_slug: snap
+    enabled: false  # Snap is not on Greenhouse; Workday tenant returns 422.
+                    # Likely on Phenom or custom — TODO: find their public board.
+  - name: Dropbox
+    ats: greenhouse
+    board_slug: dropbox
+  - name: Pinterest
+    ats: greenhouse
+    board_slug: pinterest
+  - name: Lyft
+    ats: greenhouse
+    board_slug: lyft
+  - name: DoorDash
+    ats: greenhouse
+    board_slug: doordashusa  # verified: 449 jobs at this slug; "doordash" is 404
+  - name: Coinbase
+    ats: greenhouse
+    board_slug: coinbase
+  - name: Robinhood
+    ats: greenhouse
+    board_slug: robinhood
+  - name: Block
+    ats: greenhouse
+    board_slug: block
+  - name: Databricks
+    ats: greenhouse
+    board_slug: databricks
+  - name: MongoDB
+    ats: greenhouse
+    board_slug: mongodb
+  - name: Datadog
+    ats: greenhouse
+    board_slug: datadog
+  - name: Cloudflare
+    ats: greenhouse
+    board_slug: cloudflare
+  - name: Twilio
+    ats: greenhouse
+    board_slug: twilio
+  - name: HashiCorp
+    ats: greenhouse
+    board_slug: hashicorp
+    enabled: false  # No public board after IBM acquisition; Workday returns 401.
+  # ── Greenhouse AI labs / scaleups ────────────────────────────────────────
+  - name: xAI
+    ats: greenhouse
+    board_slug: xai
+  - name: Scale AI
+    ats: greenhouse
+    board_slug: scaleai
+  - name: Together AI
+    ats: greenhouse
+    board_slug: togetherai
+  - name: Fireworks AI
+    ats: greenhouse
+    board_slug: fireworksai
+  - name: Glean
+    ats: greenhouse
+    board_slug: gleanwork
+  # ── Ashby AI labs ────────────────────────────────────────────────────────
+
+  - name: Perplexity
+    ats: ashby
+    board_slug: perplexity
+  - name: Decagon
+    ats: ashby
+    board_slug: decagon
+  - name: Character.AI
+    ats: ashby
+    board_slug: character
+  - name: OpenRouter
+    ats: ashby
+    board_slug: openrouter
+  # ── Cursor (custom careers HTML) ─────────────────────────────────────────
+  - name: Cursor
+    ats: cursor_careers
+  # ── TikTok (lifeattiktok.com + USDS) ────────────────────────────────────
+  # Main portal migrated from careers.tiktok.com to lifeattiktok.com (2025).
+  # Uses POST API with `website-path: tiktok` header. JD inline.
+  # USDS portal requires Playwright (browser _signature).
+  - name: TikTok
+    ats: tiktok_careers
+    # Server-side filters (same IDs as USDS portal).
+    tiktok_job_category_id_list:
+      - "6704215862603155720"   # R&D
+    tiktok_location_code_list:
+      - "CT_157"               # example location code — replace with yours
+    tiktok_recruitment_id_list:
+      - "1"                    # Experienced
+    # Per-company title override: only tech lead roles (skip SWE/backend)
+    title_include:
+      - tech lead
+      - engineering lead
+      - architect
+    title_exclude:
+      - sre
+      - site reliability
+      - machine learning
+      - quality assurance
+  - name: TikTok USDS
+    ats: tiktok_usds
+    # Server-side filters (from careers.tiktokusds.com filter sidebar).
+    # These drastically reduce noise: 303 → ~50 jobs.
+    usds_job_category_id_list:
+      - "6704215862603155720"   # R&D
+    usds_location_code_list:
+      - "CT_157"               # example location code — replace with yours
+    usds_recruitment_id_list:
+      - "1"                    # Experienced
+    # Per-company title override: only tech lead roles (skip SWE/SRE)
+    title_include:
+      - tech lead
+      - engineering lead
+      - architect
+    title_exclude:
+      - sre
+      - site reliability
+      - machine learning
+      - quality assurance
+  # ── Workday tenants ─────────────────────────────────────────────────────
+  # Each tenant has a different pod (wd1/wd5/wd12...) and site path. If a
+  # listing fails, verify the URL by visiting {tenant}.{pod}.myworkdayjobs.com
+  # in a browser and reading the path. Mark UNTESTED until first successful run.
+  - name: Salesforce
+    ats: workday
+    workday_tenant: salesforce
+    workday_pod: wd12
+    workday_site: External_Career_Site
+  - name: Nvidia
+    ats: workday
+    workday_tenant: nvidia
+    workday_pod: wd5
+    workday_site: NVIDIAExternalCareerSite
+  - name: Adobe
+    ats: workday
+    workday_tenant: adobe
+    workday_pod: wd5
+    workday_site: external_experienced
+  - name: Cisco
+    ats: workday
+    workday_tenant: cisco
+    workday_pod: wd5
+    workday_site: Cisco_Careers  # verified: 937 jobs (was at_cisco — 404)
+  - name: Tesla
+    ats: workday
+    workday_tenant: tesla
+    workday_pod: wd1
+    workday_site: Tesla
+    enabled: false  # Workday endpoint returns 422 on every site path; tenant
+                    # likely requires CSRF/session token. TODO: investigate.
+  - name: Walmart
+    ats: workday
+    workday_tenant: walmart
+    workday_pod: wd5
+    workday_site: WalmartExternal
+    title_include:
+      - principal
+      - distinguished
+  # ── TikTok / ByteDance ──────────────────────────────────────────────────
+  # Disabled: careers.tiktok.com /api/v1/search/job/posts returns 200 with empty
+  # body for both GET and POST — bot-detection. Would need headless browser or
+  # email-alerts approach. Kept entry so the adapter is exercised by tests.
+  - name: TikTok
+    ats: tiktok_careers
+    tiktok_portal_type: 6
+    enabled: false
+  # ── 小红书 / Xiaohongshu ────────────────────────────────────────────────
+  # Disabled: probed Greenhouse / Lever / Ashby slugs (xiaohongshu / rednote /
+  # xhs / redusa / xhsusa) — all 404. They likely use LinkedIn / their own
+  # careers site only. Recommended path: set up an email alert on Indeed or
+  # LinkedIn for "Xiaohongshu" / "RedNote" and parse those instead.
+  - name: Xiaohongshu
+    ats: lever
+    board_slug: xiaohongshu
+    enabled: false
+  # ── Cross-company aggregators ────────────────────────────────────────────
+  # Each entry produces jobs from many companies. The "name" field is just a
+  # source label for logs; the canonical company name comes from each job.
+  # Disable if signal-to-noise is too low.
+  # --- AI / ML companies ---
+  - name: Cohere
+    ats: ashby
+    board_slug: cohere
+  - name: Mistral AI
+    ats: lever
+    board_slug: mistral
+  - name: Baseten
+    ats: ashby
+    board_slug: baseten
+  - name: Anyscale
+    ats: ashby
+    board_slug: anyscale
+  - name: SambaNova
+    ats: greenhouse
+    board_slug: sambanovasystems
+  - name: Runway
+    ats: ashby
+    board_slug: runway-ml
+  - name: ElevenLabs
+    ats: ashby
+    board_slug: elevenlabs
+  - name: Replit
+    ats: ashby
+    board_slug: replit
+  # --- Data / Cloud / SaaS ---
+  - name: Snowflake
+    ats: ashby
+    board_slug: snowflake
+  - name: ClickHouse
+    ats: greenhouse
+    board_slug: clickhouse
+  - name: Notion
+    ats: ashby
+    board_slug: notion
+  - name: Shopify
+    ats: shopify_careers
+  # --- Aggregators ---
+  - name: RemoteOK
+    ats: remoteok
+  - name: We Work Remotely
+    ats: weworkremotely
+    # Override default RSS categories if you want narrower scope:
+    # wwr_feeds:
+    #   - https://weworkremotely.com/categories/remote-back-end-programming-jobs.rss
+
+scan:
+  title_include:
+    - software engineer
+    - staff engineer
+    - principal engineer
+    - platform engineer
+    - infrastructure engineer
+    - backend engineer
+    - tech lead
+    - technical lead
+    - engineering lead
+    - ai platform
+    - ai infrastructure
+    - ml platform
+    - ml infrastructure
+    - api platform
+    - distributed systems
+  title_exclude:
+    - mobile
+    - ios
+    - android
+    - frontend
+    - front-end
+    - full stack
+    - fullstack
+    - full-stack
+    - ui engineer
+    - ux engineer
+    - quality assurance
+    - test engineer
+    - sdet
+    - data scientist
+    - data analyst
+    - designer
+    - product manager
+    - sales
+    - recruiter
+    - marketing
+    - manager
+    - director
+    - vp
+    - site reliability
+    - sre
+    - machine learning engineer
+  # Location filter: onsite jobs must match one of these cities/metros.
+  # Remote and hybrid jobs always pass. Empty list = no location filter.
+  location_filter:
+    allowed_cities:
+      # Replace with your own target city/metro (lowercase substring match).
+      - your-city
+    allow_remote: true
+
+jobs_target_scan_json:
+  source: project_relative
+  path: data/inbox/jobs_target_scan.json
+
+profile:
+  source: project_relative
+  path: resume/profile.yaml
+
+jobs_inbox_json:
+  source: project_relative
+  path: data/inbox/jobs_today.json
+
+jobs_enriched_json:
+  source: project_relative
+  path: data/inbox/jobs_enriched.json
+
+seen_jobs_json:
+  source: project_relative
+  path: data/seen_jobs.json
+
+output:
+  obsidian_base_dir: Career/Jobs
+
+matching:
+  strong_threshold: 75
+  medium_threshold: 60
+
+external_jd:
+  search_enabled: true
+  allowed_domains:
+    - greenhouse.io
+    - lever.co
+    - ashbyhq.com
+    - myworkdayjobs.com
+    - smartrecruiters.com
+    - anthropic.com
+    - character.ai
+    - cursor.com
+    - decagon.ai
+    - openrouter.ai
+    - fireworks.ai
+    - glean.com
+    - perplexity.ai
+    - scale.com
+    - together.ai
+    - x.ai
+  resolvers:
+    Microsoft:
+      type: microsoft_pcsx
+      domain: microsoft.com
+    Microsoft AI:
+      type: microsoft_pcsx
+      domain: microsoft.com
+    Stripe:
+      type: greenhouse
+      board_slug: stripe
+    OfferUp:
+      type: greenhouse
+      board_slug: offerup
+    Visa:
+      type: smartrecruiters
+      company_slug: visa
+    # Whatnot:
+    #   type: ashby
+    #   board_slug: whatnot
+    OpenRouter:
+      type: ashby
+      board_slug: openrouter
+    Open Router:
+      type: ashby
+      board_slug: openrouter
+    Fireworks AI:
+      type: greenhouse
+      board_slug: fireworksai
+    Fireworks:
+      type: greenhouse
+      board_slug: fireworksai
+    Together AI:
+      type: greenhouse
+      board_slug: togetherai
+    Together:
+      type: greenhouse
+      board_slug: togetherai
+    Perplexity:
+      type: ashby
+      board_slug: perplexity
+    Perplexity AI:
+      type: ashby
+      board_slug: perplexity
+    Character.AI:
+      type: ashby
+      board_slug: character
+    Character.ai:
+      type: ashby
+      board_slug: character
+    Character AI:
+      type: ashby
+      board_slug: character
+    Scale AI:
+      type: greenhouse
+      board_slug: scaleai
+    Scale:
+      type: greenhouse
+      board_slug: scaleai
+    xAI:
+      type: greenhouse
+      board_slug: xai
+    XAI:
+      type: greenhouse
+      board_slug: xai
+    Anthropic:
+      type: greenhouse
+      board_slug: anthropic
+    Cursor:
+      type: cursor_careers
+    Cursor AI:
+      type: cursor_careers
+    Decagon:
+      type: ashby
+      board_slug: decagon
+    Glean:
+      type: greenhouse
+      board_slug: gleanwork
+
+# Seniority-level calibration used by resolve_external_jd.py to hard-filter
+# jobs whose level is outside the target band before any LLM calls.
+# See also: scripts/resolve_external_jd.py::determine_tier, is_in_band.
+level_calibration:
+  # User's target seniority band (inclusive, by tier name).
+  target_band:
+    min_tier: staff
+    max_tier: senior_staff
+
+  # Ordinal ranking of tiers. Used purely for comparison with target_band.
+  tier_order:
+    junior: 1
+    mid: 2
+    senior: 3
+    staff: 4
+    senior_staff: 5
+    principal: 6
+    distinguished: 7
+
+  # Per-company title → tier mappings.
+  # Rules are evaluated top-to-bottom, FIRST MATCH WINS — put longer/more
+  # specific patterns before shorter ones ("senior principal" before "principal").
+  # Pattern is case-insensitive substring match against the job title.
+  companies:
+    Snap:
+      rules:
+        - { pattern: "senior principal", tier: distinguished }
+        - { pattern: "principal",         tier: principal      }   # Snap Principal ≈ L7, above target
+        - { pattern: "senior staff",      tier: senior_staff   }
+        - { pattern: "staff",             tier: staff          }   # Snap Staff ≈ L6, in band
+        - { pattern: "senior",            tier: senior         }
+    "Snap Inc.":
+      rules:
+        - { pattern: "senior principal", tier: distinguished }
+        - { pattern: "principal",         tier: principal      }
+        - { pattern: "staff",             tier: staff          }
+        - { pattern: "senior",            tier: senior         }
+    Salesforce:
+      # User calibration: Salesforce Principal titles match the user's level
+      # → map plain "Principal" to senior_staff (in band). The more specific
+      # "principal architect" / "principal mts" already mapped here.
+      rules:
+        - { pattern: "principal architect", tier: senior_staff }
+        - { pattern: "principal mts",       tier: senior_staff }
+        - { pattern: "principal",           tier: senior_staff }   # Salesforce Principal ≈ in band per user
+        - { pattern: "lead mts",            tier: staff        }
+        - { pattern: "lead software engineer", tier: senior    }   # Lead SWE (not MTS ladder) ≈ L4–L5, below target
+        - { pattern: "lead",                tier: senior       }
+        - { pattern: "senior mts",          tier: senior       }
+        - { pattern: "staff",               tier: staff        }
+    Airbnb:
+      rules:
+        - { pattern: "principal",      tier: principal     }   # Airbnb Principal ≈ L7, above target
+        - { pattern: "senior staff",   tier: senior_staff  }
+        - { pattern: "staff",          tier: staff         }
+        - { pattern: "senior",         tier: senior        }
+    Netflix:
+      # Netflix uses numbered IC engineering levels in three observed title
+      # formats:
+      #   1. "Software Engineer 5 - X"             (bare number)
+      #   2. "Software Engineer L5 - X"            (L-prefixed)
+      #   3. "Senior Software Engineer (L5) - X"   (parenthesized, with "Senior")
+      # User calibration: Netflix's Senior tier (L4-L5) matches → both in-band.
+      # An untagged "Senior X Engineer" with no level marker is also treated as
+      # in-band (staff tier) — Netflix doesn't otherwise distinguish, and the
+      # title_filter step already dropped non-engineering Senior roles.
+      rules:
+        - { pattern: "engineer 7",  tier: distinguished }
+        - { pattern: "engineer l7", tier: distinguished }
+        - { pattern: "(l7)",        tier: distinguished }
+        - { pattern: "engineer 6",  tier: principal     }    # Netflix L6 ≈ above band
+        - { pattern: "engineer l6", tier: principal     }
+        - { pattern: "(l6)",        tier: principal     }
+        - { pattern: "engineer 5",  tier: senior_staff  }    # in band (Netflix Senior top)
+        - { pattern: "engineer l5", tier: senior_staff  }
+        - { pattern: "(l5)",        tier: senior_staff  }
+        - { pattern: "engineer 4",  tier: staff         }    # in band (Netflix Senior bottom)
+        - { pattern: "engineer l4", tier: staff         }
+        - { pattern: "(l4)",        tier: staff         }
+        - { pattern: "engineer 3",  tier: senior        }    # below band
+        # Catch-all for level-less Netflix engineering titles per user calibration.
+        - { pattern: "senior",      tier: staff         }
+        - { pattern: "lead",        tier: staff         }   # "Technical Lead" at Netflix
+    TikTok:
+      rules:
+        - { pattern: "engineering tech lead", tier: staff    }
+        - { pattern: "tech lead",             tier: staff    }
+        - { pattern: "staff",                 tier: staff    }
+        - { pattern: "senior",                tier: senior   }
+    "TikTok USDS Joint Venture":
+      rules:
+        - { pattern: "tech lead", tier: staff  }
+        - { pattern: "staff",     tier: staff  }
+        - { pattern: "senior",    tier: senior }
+    # Enterprise / non-big-tech — Principal title typically deflated to Staff-equivalent
+    F5:
+      rules:
+        - { pattern: "sr. principal", tier: senior_staff }
+        - { pattern: "senior principal", tier: senior_staff }
+        - { pattern: "principal",      tier: staff        }   # F5 Principal ≈ L5–L6
+        - { pattern: "staff",          tier: staff        }
+    Siemens:
+      rules:
+        - { pattern: "sr. principal",    tier: senior_staff }
+        - { pattern: "senior principal", tier: senior_staff }
+        - { pattern: "principal",        tier: staff        }
+        - { pattern: "staff",            tier: staff        }
+    JPMorganChase:
+      rules:
+        - { pattern: "senior principal", tier: senior_staff }
+        - { pattern: "principal",        tier: staff        }
+        - { pattern: "executive director", tier: staff      }
+    Walmart:
+      # User calibration: Walmart Principal titles match the user's level
+      # → senior_staff (in band) instead of principal (above band).
+      rules:
+        - { pattern: "principal",     tier: senior_staff }   # Walmart Principal ≈ in band per user
+        - { pattern: "senior staff",  tier: senior_staff }
+        - { pattern: "staff",         tier: staff        }
+        - { pattern: "senior",        tier: senior       }
+    Carta:
+      rules:
+        - { pattern: "principal",    tier: senior_staff }
+        - { pattern: "staff",        tier: staff        }
+        - { pattern: "senior",       tier: senior       }
+    GitHub:
+      rules:
+        - { pattern: "senior principal", tier: principal    }
+        - { pattern: "principal",        tier: senior_staff }
+        - { pattern: "senior staff",     tier: senior_staff }
+        - { pattern: "staff",            tier: staff        }
+        - { pattern: "senior",           tier: senior       }
+    Google:
+      rules:
+        - { pattern: "distinguished",    tier: distinguished }
+        - { pattern: "senior principal", tier: principal    }
+        - { pattern: "principal",        tier: principal    }
+        - { pattern: "senior staff",     tier: senior_staff }
+        - { pattern: "staff",            tier: staff        }
+        - { pattern: "senior",           tier: senior       }
+    Meta:
+      rules:
+        - { pattern: "distinguished",    tier: distinguished }
+        - { pattern: "senior principal", tier: principal    }
+        - { pattern: "principal",        tier: principal    }
+        - { pattern: "senior staff",     tier: senior_staff }
+        - { pattern: "staff",            tier: staff        }
+        - { pattern: "senior",           tier: senior       }
+    Amazon:
+      rules:
+        - { pattern: "distinguished",     tier: distinguished }
+        - { pattern: "senior principal",  tier: principal    }
+        - { pattern: "principal",         tier: senior_staff }   # Amazon Principal (L7) ≈ Meta E7
+        - { pattern: "senior sde",        tier: senior       }
+        - { pattern: "senior",            tier: senior       }
+        - { pattern: "sde ii",            tier: mid          }   # Amazon SDE II (L5) — below target
+        - { pattern: "software engineer ii", tier: mid       }   # Same level, alternate title format
+        - { pattern: "sde i",             tier: junior       }   # Amazon SDE I (L4) — well below target
+        - { pattern: "software engineer i", tier: junior     }   # Same level, alternate title format
+    Microsoft:
+      rules:
+        - { pattern: "partner",           tier: principal    }
+        - { pattern: "senior principal",  tier: principal    }
+        - { pattern: "principal",         tier: senior_staff }
+        - { pattern: "senior",            tier: senior       }
+
+  # Applied when the job's company is not listed above.
+  # Conservative — treats "Principal" as above target by default, since at most
+  # big-tech companies it is. Companies with deflated Principal titles should
+  # be added explicitly to the `companies` section above.
+  default_rules:
+    - { pattern: "distinguished",    tier: distinguished }
+    - { pattern: "sr. principal",    tier: senior_staff  }
+    - { pattern: "senior principal", tier: senior_staff  }
+    - { pattern: "principal",        tier: principal     }
+    - { pattern: "senior staff",     tier: senior_staff  }
+    - { pattern: "engineering tech lead", tier: staff    }
+    - { pattern: "tech lead",        tier: staff         }
+    - { pattern: "staff",            tier: staff         }
+    - { pattern: "lead",             tier: senior        }
+    - { pattern: "senior",           tier: senior        }
+
+  # Jobs whose tier cannot be determined (no rule matched) get this status.
+  # Set to "in_band" to let them pass, or "out_of_band_unknown" to skip.
+  unknown_policy: in_band
+
+# Title-level pre-filter applied between fetch and resolve.
+# See scripts/filter_titles.py and docs/superpowers/specs/2026-04-25-job-scout-pending-inbox-design.md
+filter:
+  include_keywords:
+    - staff
+    - principal
+    - senior staff
+    - platform
+    - infrastructure
+    - backend
+    - tech lead
+    - engineering lead
+  exclude_keywords:
+    - frontend
+    - front-end
+    - full stack
+    - fullstack
+    - full-stack
+    - ui engineer
+    - ux engineer
+    - mobile
+    - ios
+    - android
+    - ml engineer
+    - machine learning engineer
+    - mle
+    - applied scientist
+    - research engineer
+    - research scientist
+    - data scientist
+    - data analyst
+    - data engineer
+    - analytics engineer
+    - quality assurance
+    - test engineer
+    - sdet
+    - manager
+    - director
+    - vp
+    - head of
+    - product manager
+    - designer
+    - sales
+    - recruiter
+    - marketing
+  allow_override_companies:
+    - Anthropic
+    - Cursor
+  ambiguous_policy: llm        # llm | pending
+  llm_model: claude-haiku-4.5
+
+# Geo filter: drop jobs whose location is non-US before LLM scoring / resolve.
+# US is detected by an explicit US token (united states / usa / us as a whole word).
+# Non-US is detected by substring match against `non_us_keywords`. Multi-region
+# postings that mention US (e.g. "US, Canada, UK") pass — the US keyword wins.
+# unknown_policy controls jobs whose location is empty or matches no keyword:
+#   pass   → let through to triage (conservative; may include some non-US)
+#   filter → drop them (aggressive; loses jobs whose parser failed)
+location_filter:
+  enabled: true
+  unknown_policy: pass
+  non_us_keywords:
+    - canada
+    - india
+    - china
+    - poland
+    - spain
+    - brazil
+    - mexico
+    - united kingdom
+    - " uk"
+    - "uk-"
+    - "-uk"
+    - ireland
+    - germany
+    - france
+    - netherlands
+    - amsterdam
+    - london
+    - paris
+    - berlin
+    - dublin
+    - tokyo
+    - japan
+    - korea
+    - singapore
+    - australia
+    - new zealand
+    - argentina
+    - chile
+    - colombia
+    - israel
+    - taiwan
+    - hong kong
+    - philippines
+    - thailand
+    - vietnam
+    - indonesia
+    - south africa
+    - bangalore
+    - bengaluru
+    - mumbai
+    - hyderabad
+    - delhi
+    - gurgaon
+    - pune
+    - chennai
+    - são paulo
+    - sao paulo
+    - rio de janeiro
+    - emea
+    - apac
+    - latam
+
+# Hard gate: no LLM scoring without a JD body of at least N chars.
+scoring:
+  require_jd_text: true
+  min_jd_text_chars: 200

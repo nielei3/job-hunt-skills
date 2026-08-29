@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/rendercv/rendercv/refs/tags/v2.8/schema.json
+#
+# RESUME BUILDER — BASE TEMPLATE
+# -------------------------------
+# Copy this file to your data directory (e.g., Career/Resume/rendercv/<Your_Name>_Resume.yaml)
+# and fill in the placeholders. Keep the schema comment above — it gives your editor
+# (VS Code / Cursor / Obsidian with YAML plugin) real-time validation and autocomplete.
+#
+# Render with (from inside Career/Resume/rendercv/):
+#   rendercv render <Your_Name>_Resume.yaml
+#
+# Output paths are pinned by the `settings.render_command` block at the bottom of
+# this file — artifacts land in `Career/Resume/<Name>_Resume.{pdf,typ,md,html,png}`,
+# directly under Resume/ (not 3-deep in `rendercv_output/`).
+#
+# See the skill's references/decision-frameworks.md for content rules.
+
+cv:
+  name: "YOUR NAME"
+  # Headline mirrors your LinkedIn headline exactly.
+  # Pattern: <Role Identity> | <Domain Keywords> | ex-<Company, Company, Company>
+  headline: "YOUR ROLE | Keyword1, Keyword2, Keyword3 | ex-Company1, Company2"
+  location: "City, State"
+  email: "you@example.com"
+  phone: "tel:+1-xxx-xxx-xxxx"
+  social_networks:
+    - network: LinkedIn
+      username: "your-linkedin-handle"
+    # Optional:
+    # - network: GitHub
+    #   username: "your-github-handle"
+
+  sections:
+    Summary:
+      - "First line: role identity + years of experience + domain."
+      - "Second line: specialty, most recent differentiating work."
+      # Keep to 2-3 lines. Don't restate the headline.
+
+    Technical Skills:
+      # Reorder categories so the most target-relevant goes first.
+      - label: "AI/LLM"
+        details: "LLM infrastructure, model proxy, RAG, agentic workflows, observability for AI systems"
+      - label: "Languages"
+        details: "Language1, Language2, Language3"
+      - label: "Cloud & Infra"
+        details: "AWS (service, service, service), other cloud tech"
+      - label: "Data & Storage"
+        details: "Database1, Database2, cache layer"
+      - label: "Platform"
+        details: "Distributed systems, API gateway, service reliability, incident response"
+
+    Experience:
+      # Most recent first. 3-5 bullets per recent role, fewer for older.
+      - company: "Current Company"
+        position: "Your Role"
+        start_date: "YYYY-MM"
+        end_date: "present"
+        location: "City, State"
+        highlights:
+          - "Action verb + what you built + scale + outcome."
+          - "Another achievement with a concrete metric where possible."
+          - "Another achievement."
+          - "Another achievement."
+
+      - company: "Previous Company"
+        position: "Previous Role"
+        start_date: "YYYY-MM"
+        end_date: "YYYY-MM"
+        location: "City, State"
+        highlights:
+          - "Achievement."
+          - "Achievement."
+
+      # ... add more roles, compressing bullets for older ones.
+
+      # Consider dropping roles older than 12-15 years unless they bridge to current target domain.
+
+    Education:
+      - institution: "University Name"
+        area: "Field of Study"
+        degree: "MS"  # or BS, PhD, etc.
+        location: "City, Country"
+        # start_date and end_date optional — omitting avoids dating yourself
+        # highlights optional — usually unnecessary at Staff+ level
+
+design:
+  theme: engineeringresumes
+
+  # IMPORTANT: This override puts Company first, Position second in the Experience section.
+  # Default engineeringresumes puts position first. For Staff+ IC/TL, company-first reads better
+  # because company brand carries more recognition weight than title.
+  templates:
+    experience_entry:
+      main_column: "**COMPANY**, POSITION -- LOCATION\nSUMMARY\nHIGHLIGHTS"
+
+  # Optional font override if default isn't installed:
+  # typography:
+  #   font_family: "New Computer Modern"  # ships with Typst
+
+  # Optional color override:
+  # colors:
+  #   text: "black"
+  #   name: "black"
+  #   connections: "gray"
+  #   section_titles: "black"
+  #   links: "blue"
+
+# Output configuration: artifacts go to Career/Resume/ directly (one level up
+# from this YAML's directory), and filenames use `<Name>_Resume.*` derived from
+# `cv.name` snake-cased. To force a custom filename (e.g. surname in caps), replace
+# `NAME_IN_SNAKE_CASE` with a literal string like `Lei_NIE`.
+settings:
+  render_command:
+    output_folder: ..
+    pdf_path: OUTPUT_FOLDER/NAME_IN_SNAKE_CASE_Resume.pdf
+    typst_path: OUTPUT_FOLDER/NAME_IN_SNAKE_CASE_Resume.typ
+    markdown_path: OUTPUT_FOLDER/NAME_IN_SNAKE_CASE_Resume.md
+    html_path: OUTPUT_FOLDER/NAME_IN_SNAKE_CASE_Resume.html
+    png_path: OUTPUT_FOLDER/NAME_IN_SNAKE_CASE_Resume.png
+
+# Optional locale override:
+# locale:
+#   language: english  # NOT "en" — use full name. Omit for default.
