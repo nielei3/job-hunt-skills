@@ -1,0 +1,51 @@
+# EXAMPLE profile — copy this file and replace every value with your own.
+# job-scout reads this to score and filter job postings against your criteria.
+name: Jane Doe
+target_roles:
+  - Staff Software Engineer
+  - Senior Software Engineer
+  - Backend Engineer
+
+role_type: backend_ic
+role_type_description: >
+  Example: IC backend engineer. Describe in one or two sentences what you build
+  and, importantly, what you do NOT want (this drives filtering).
+
+role_type_exclusions:
+  - Engineering Manager
+  - Frontend Engineer
+  - Data Scientist
+
+locations:
+  - Your City, ST
+  - Remote - US
+
+remote_ok: true
+work_authorization: Describe your authorization (e.g. citizen / needs sponsorship)
+
+core_skills:
+  - List
+  - the
+  - skills
+  - you
+  - want
+  - matched
+
+years_experience: 10
+
+seniority_floor: Senior
+seniority_description: >
+  Example: Senior or above. State your floor and any borderline cases so the
+  scorer knows what to down-rank.
+
+industries:
+  - Example industry 1
+  - Example industry 2
+
+must_have_preferences:
+  - IC role (not management)
+  - Backend focus
+
+nice_to_have_preferences:
+  - Remote-friendly
+  - Modern stack

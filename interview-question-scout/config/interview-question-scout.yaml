@@ -1,0 +1,65 @@
+source:
+  # URL template; swap {slug} for any supported company.
+  base_url_template: "https://jobs.1point3acres.com/companies/{slug}/interview"
+  cdp_url: http://localhost:9222
+
+companies:
+  - name: TikTok
+    slug: tiktok
+    enabled: true
+    obsidian_file: Career/Company/TikTok/0 interview experience.md
+
+  - name: Capital One
+    slug: capitalone
+    enabled: false
+    obsidian_file: Career/Company/Capital One/0 interview experience.md
+
+  - name: Anthropic
+    slug: anthropic
+    enabled: true
+    obsidian_file: Career/Company/Anthropic/0 interview experience.md
+
+  - name: Pinterest
+    slug: pinterest
+    enabled: true
+    obsidian_file: Career/Company/Pinterest/0 interview experience.md
+
+  - name: Whatnot
+    slug: whatnot
+    enabled: false
+    obsidian_file: Career/Company/Whatnot/0 interview experience.md
+
+  - name: Uber
+    slug: uber
+    enabled: true
+    obsidian_file: Career/Company/Uber/0 interview experience.md
+
+  - name: The Trade Desk
+    slug: tradedesk
+    enabled: true
+    obsidian_file: Career/Company/The Trade Desk/0 interview experience.md
+
+  # Template for future companies. Enable by flipping `enabled: true`.
+  # - name: Google
+  #   slug: google
+  #   enabled: false
+  #   obsidian_file: Career/Company/Google/0 interview experience.md
+
+scrape:
+  posts_per_run_limit: 200         # bulk backfill ceiling (raised from 20 for deep first-run)
+  fetch_interval_seconds: 6        # delay between thread fetches (slower to avoid rate-limit / dami lock)
+  page_render_delay_seconds: 6     # wait after DOMContentLoaded for JS render
+  # jobs.1p3a list page shows the 9 newest threads; 12h cadence is enough for OpenAI volume.
+  # If a company ever bursts > 9 threads between runs we accept the miss.
+
+summarize:
+  provider: openai
+  model: claude-opus-4.6
+  base_url: https://api.openai.com/v1
+  max_body_chars: 8000             # truncate long posts before sending to LLM
+  timeout_seconds: 120
+
+discord:
+  enabled: true
+  channel_env: DISCORD_HOME_CHANNEL
+  rate_limit_sleep_seconds: 1.5

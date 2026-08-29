@@ -1,0 +1,25 @@
+# macOS
+.DS_Store
+
+# Local agent runtime state (Claude Code + plugins)
+.claude/
+.omc/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Local env — never commit. Copy the *.env.example files and fill in locally.
+.env
+**/.env
+
+# job-scout: runtime data (email alerts, scoring history, daily snapshots)
+job-scout/data/
+
+# Personal resume / profile data — keep real data out of git.
+# The committed profile.yaml is an EXAMPLE template; overwrite it locally.
+resume-builder/**/*_CV.yaml
+resume-builder/**/*_Resume.yaml
+!resume-builder/**/*.yaml.template
+resume-builder/**/rendercv_output/
